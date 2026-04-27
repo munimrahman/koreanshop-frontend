@@ -49,7 +49,8 @@ export const useManualOrder = () => {
       // Use the existing getProducts API with search functionality
       const response = await getProducts({
         limit: 50,
-        search: search
+        search: search,
+        includeVariations: true
         // Assuming your API supports search, otherwise we'll filter client-side
       });
       

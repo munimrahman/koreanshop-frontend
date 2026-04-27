@@ -14,6 +14,19 @@ import type { Metadata } from "next";
 import PageViewEvent from "@/components/PixelComponent/PageViewEvent";
 import { generateEventId } from "@/lib/utils";
 
+// Pre-render all existing product pages at build time.
+// New products added after build are rendered on first visit and then cached.
+export const revalidate = 600;
+
+export async function generateStaticParams() {
+  try {
+    const result = await getProducts({ limit: 200, page: 1 });
+    return result.products.map((p: { id: string }) => ({ id: p.id }));
+  } catch {
+    return [];
+  }
+}
+
 interface ProductPageProps {
   params: Promise<{ id: string }>;
 }

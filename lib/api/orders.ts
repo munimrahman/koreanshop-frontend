@@ -100,6 +100,7 @@ export interface CheckoutRequest {
   billingAddress: string;
   paymentMethod: 'CASH_ON_DELIVERY' | 'CARD' | 'MOBILE_BANKING';
   notes?: string;
+  customShippingFee?: number; // Frontend-selected shipping fee
 }
 
 export interface CheckoutResponse {

@@ -156,6 +156,18 @@ export default async function RootLayout({
             `,
           }}
         />
+        {/* <!-- Google tag (gtag.js) --> */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-NPTTRXW8L1"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-NPTTRXW8L1');
+            `,
+          }}
+        />
         <noscript>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

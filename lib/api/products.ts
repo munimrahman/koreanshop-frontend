@@ -192,7 +192,8 @@ export const getProducts = async (
   }
 
   const response = await fetch(
-    `${API_BASE_URL}/products/public?${searchParams.toString()}`
+    `${API_BASE_URL}/products/public?${searchParams.toString()}`,
+    { next: { revalidate: 60 } }
   );
 
   if (!response.ok) {
@@ -292,7 +293,8 @@ export const getProduct = async (
   if (includeBrand) searchParams.append("includeBrand", "true");
 
   const response = await fetch(
-    `${API_BASE_URL}/products/public/${id}?${searchParams.toString()}`
+    `${API_BASE_URL}/products/public/${id}?${searchParams.toString()}`,
+    { next: { revalidate: 120 } }
   );
 
   if (!response.ok) {

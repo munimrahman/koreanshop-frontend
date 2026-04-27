@@ -35,7 +35,7 @@ export const getBrands = async (
     page = 1,
     limit = 50
 ): Promise<BrandsResponse> => {
-    const response = await fetch(`${API_BASE_URL}/brands?page=${page}&limit=${limit}`);
+    const response = await fetch(`${API_BASE_URL}/brands?page=${page}&limit=${limit}`, { next: { revalidate: 300 } });
 
     if (!response.ok) {
         throw new Error('Failed to fetch brands');

@@ -50,18 +50,27 @@ export interface UpdateShippingChargeRequest {
 // Get all shipping charges
 export const getAllShippingCharges = async (): Promise<ShippingChargesResponse> => {
   try {
+    if (!API_BASE_URL) {
+      throw new Error('API_BASE_URL is not configured');
+    }
+
     const response = await fetch(`${API_BASE_URL}/shipping-charges`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch shipping charges');
+      const errorText = await response.text().catch(() => 'Unknown error');
+      throw new Error(`Failed to fetch shipping charges: ${response.status} - ${errorText}`);
     }
 
     return response.json();
   } catch (error) {
-    console.error('Shipping charges API Error:', error);
+    console.error('Shipping charges API Error:', {
+      error,
+      apiUrl: API_BASE_URL,
+      endpoint: `${API_BASE_URL}/shipping-charges`
+    });
     throw error;
   }
 };

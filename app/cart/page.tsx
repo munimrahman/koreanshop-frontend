@@ -231,7 +231,7 @@ export default function CartPage() {
 
       if (res?.data?.enhanced) {
         // handle pixel and conversion api
-        await fetch("/api/fb-conversion", {
+        fetch("/api/fb-conversion", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -241,7 +241,7 @@ export default function CartPage() {
             eventId: eventId,
             eventTime: fbEventTime,
           }),
-        });
+        }).catch(() => {});
 
         (window as any).fbq(
           "track",

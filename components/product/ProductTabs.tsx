@@ -25,7 +25,30 @@ export function ProductTabs({ product, onReviewSubmitted }: ProductTabsProps) {
   useEffect(() => {
     getAllShippingCharges()
       .then((res: ShippingChargesResponse) => setShippingCharges(res.data))
-      .catch((err) => console.error("Error loading shipping charges:", err));
+      .catch((err) => {
+        console.error("Error loading shipping charges:", err);
+        // Set fallback shipping charges if API fails
+        setShippingCharges({
+          dhaka: 80,
+          outsideDhaka: 150,
+          details: [
+            {
+              id: 'fallback-dhaka',
+              region: 'dhaka',
+              charge: 80,
+              description: 'Standard delivery within Dhaka',
+              updatedAt: new Date().toISOString()
+            },
+            {
+              id: 'fallback-outside',
+              region: 'outside_dhaka',
+              charge: 150,
+              description: 'Standard delivery outside Dhaka',
+              updatedAt: new Date().toISOString()
+            }
+          ]
+        });
+      });
   }, []);
 
   return (

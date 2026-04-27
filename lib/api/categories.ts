@@ -36,9 +36,7 @@ export const getCategories = async (page = 1, limit: number = 20): Promise<Categ
         params.append('limit', limit.toString());
     }
     const response = await fetch(`${API_BASE_URL}/categories?${params.toString()}`,
-        {
-            cache: "no-store", // ✅ forces live fetch in dev
-        }
+        { next: { revalidate: 300 } }
     );
 
     if (!response.ok) {

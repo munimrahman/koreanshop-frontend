@@ -121,6 +121,7 @@ export default function CheckoutPage() {
   const { toast } = useToast();
 
   const [sessionId, setSessionId] = useState<string>("");
+  const [sessionIdLoading, setSessionIdLoading] = useState(true);
   //   const [readiness, setReadiness] = useState<CheckoutReadinessResponse | null>(null);
   const [cartData, setCartData] = useState<EnhancedCartResponse | null>(null);
   const [shippingCharges, setShippingCharges] =
@@ -142,6 +143,7 @@ export default function CheckoutPage() {
     billingAddress: "",
     paymentMethod: "CASH_ON_DELIVERY",
     notes: "",
+    customShippingFee: undefined,
   });
   const [sameAsBilling, setSameAsBilling] = useState(true);
   const [items, setItems] = useState<CartItemWithProduct[]>([]);
@@ -150,17 +152,24 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     const fetchSessionId = async () => {
-      const id = await getSessionIdCookie();
-      setSessionId(id || "");
-      setFormData((prev) => ({
-        ...prev,
-        sessionId: id || "",
-      }));
+      try {
+        const id = await getSessionIdCookie();
+        setSessionId(id || "");
+        setFormData((prev) => ({
+          ...prev,
+          sessionId: id || "",
+        }));
+      } finally {
+        setSessionIdLoading(false);
+      }
     };
     fetchSessionId();
   }, []);
 
   useEffect(() => {
+    // Don't proceed until we've finished fetching the session ID
+    if (sessionIdLoading) return;
+
     if (!sessionId) {
       toast({
         title: "Error",
@@ -176,7 +185,7 @@ export default function CheckoutPage() {
       fetchCartData(),
       fetchShippingCharges(),
     ]);
-  }, [sessionId]);
+  }, [sessionId, sessionIdLoading]);
 
   const fetchCartData = async () => {
     try {
@@ -241,6 +250,11 @@ export default function CheckoutPage() {
       const data = await getAllShippingCharges();
       setShippingCharges(data);
       setShippingCost(data.data.dhaka); // Default to Dhaka
+      // Set initial shipping fee in formData
+      setFormData((prev) => ({
+        ...prev,
+        customShippingFee: data.data.dhaka,
+      }));
       setLoading(false);
     } catch (error: any) {
       toast({
@@ -260,6 +274,11 @@ export default function CheckoutPage() {
           ? shippingCharges.data.dhaka
           : shippingCharges.data.outsideDhaka;
       setShippingCost(cost);
+      // Update formData with the selected shipping fee for backend
+      setFormData((prev) => ({
+        ...prev,
+        customShippingFee: cost,
+      }));
     }
   };
 
@@ -282,6 +301,11 @@ export default function CheckoutPage() {
       const detectedRegion = result.data.region;
       setSelectedRegion(detectedRegion);
       setShippingCost(result.data.charge);
+      // Update formData with the calculated shipping fee
+      setFormData((prev) => ({
+        ...prev,
+        customShippingFee: result.data.charge,
+      }));
 
       toast({
         title: "Shipping Calculated",
@@ -429,7 +453,7 @@ export default function CheckoutPage() {
       // send data to facebook conversion API
       if (result.success) {
         // call Facebook conversion API from next api folder
-        await fetch("/api/fb-conversion", {
+        fetch("/api/fb-conversion", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -447,7 +471,7 @@ export default function CheckoutPage() {
               fn: [hashSHA256(formData.phone)],
             },
           }),
-        });
+        }).catch(() => {});
 
         (window as any).fbq(
           "track",
@@ -771,7 +795,7 @@ export default function CheckoutPage() {
                             </SelectContent>
                           </Select>
                         </div>
-                        <div className="flex items-end">
+                        {/* <div className="flex items-end">
                           <Button
                             type="button"
                             variant="outline"
@@ -794,7 +818,7 @@ export default function CheckoutPage() {
                               </div>
                             )}
                           </Button>
-                        </div>
+                        </div> */}
                       </div>
 
                       {/* Shipping Cost Display */}

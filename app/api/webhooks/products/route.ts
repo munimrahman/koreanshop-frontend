@@ -25,22 +25,7 @@ export async function POST(request: NextRequest) {
       revalidatePath(`/products/${productId}`)
     }
     
-    // Optionally regenerate static sitemap
-    if (process.env.NODE_ENV === 'production') {
-      try {
-        // Trigger sitemap regeneration
-        await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.koreanskincareshopbd.com'}/api/regenerate-sitemap`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${webhookSecret}`
-          }
-        })
-      } catch (error) {
-        console.log('Could not trigger sitemap regeneration:', error)
-      }
-    }
-    
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true, 
       message: `Product ${action} processed, sitemap updated` 
     })

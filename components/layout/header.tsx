@@ -48,6 +48,7 @@ import { getEnhancedCart } from "@/lib/api/cart";
 import { getSessionIdCookie } from "@/lib/cookies/session";
 import Image from "next/image";
 import useFbIds from "@/hooks/useFbIds";
+import { PAGINATION_LIMIT } from "@/constants/constants";
 
 // Type definitions
 interface Brand {
@@ -171,16 +172,6 @@ export function Header() {
     }
   };
 
-  // Fetch categories from API
-  useEffect(() => {
-    // Poll every 10 seconds for new categories
-    const interval = setInterval(() => {
-      fetchCategories(); // Refetch every 30 seconds
-    }, 10000); // 30 seconds
-
-    return () => clearInterval(interval); // Cleanup on unmount
-  }, []);
-
   useEffect(() => {
     const fetchCartData = async () => {
       try {
@@ -300,12 +291,7 @@ export function Header() {
 
   // Fetch brands from API
   useEffect(() => {
-    // Poll every 10 seconds for new categories
-    const interval = setInterval(() => {
-      fetchBrands();
-    }, 10000); // 30 seconds
-
-    return () => clearInterval(interval); // Cleanup on unmount
+     Promise.all([fetchCategories(), fetchBrands()]);
   }, []);
 
   useEffect(() => {
@@ -353,7 +339,7 @@ export function Header() {
     }
 
     // handle pixel and conversion api
-    await fetch("/api/fb-conversion", {
+    fetch("/api/fb-conversion", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -363,7 +349,7 @@ export function Header() {
         eventId: eventId,
         eventTime: fbEventTime,
       }),
-    });
+    }).catch(() => {});
 
     (window as any).fbq("track", "Search", {
       eventID: eventId,
@@ -414,7 +400,7 @@ export function Header() {
           <NavigationMenu className="hidden lg:flex">
             <NavigationMenuList>
               <NavigationMenuItem>
-                <Link href="/products" legacyBehavior passHref>
+                <Link href={`/products?page=1&per_page=${PAGINATION_LIMIT}`} legacyBehavior passHref>
                   <NavigationMenuLink className="group inline-flex justify-center items-center bg-background data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 hover:bg-accent focus:bg-accent disabled:opacity-50 px-4 py-2 rounded-md focus:outline-none w-max h-10 font-medium text-sm transition-colors hover:text-accent-foreground focus:text-accent-foreground disabled:pointer-events-none">
                     All Products
                   </NavigationMenuLink>
@@ -429,7 +415,7 @@ export function Header() {
                       categories.map((category) => (
                         <NavigationMenuLink key={category.id} asChild>
                           <Link
-                            href={`/products?category=${category.id}`}
+                            href={`/products?category=${category.id}&page=1&per_page=${PAGINATION_LIMIT}`}
                             className="block space-y-1 hover:bg-accent focus:bg-accent p-3 rounded-md outline-none no-underline leading-none transition-colors hover:text-accent-foreground focus:text-accent-foreground select-none"
                           >
                             <div className="font-medium text-sm leading-none">
@@ -475,7 +461,7 @@ export function Header() {
                       brands.map((brand) => (
                         <NavigationMenuLink key={brand.id} asChild>
                           <Link
-                            href={`/products?brand=${brand.id}`}
+                            href={`/products?brand=${brand.id}&page=1&per_page=${PAGINATION_LIMIT}`}
                             className="block space-y-1 hover:bg-accent focus:bg-accent p-3 rounded-md outline-none no-underline leading-none transition-colors hover:text-accent-foreground focus:text-accent-foreground select-none"
                           >
                             <div className="flex items-center space-x-2">
@@ -673,7 +659,7 @@ export function Header() {
                 }}
               >
                 <nav className="space-y-2 p-2">
-                  <Link href="/products" onClick={() => setIsOpen(false)}>
+                  <Link href={`/products?page=1&per_page=${PAGINATION_LIMIT}`} onClick={() => setIsOpen(false)}>
                     <div className="py-3 px-2 font-medium text-lg hover:no-underline hover:bg-accent/50 rounded-md transition-colors touch-target">
                       All Products
                     </div>
@@ -694,7 +680,7 @@ export function Header() {
                             categories.map((category) => (
                               <Link
                                 key={category.id}
-                                href={`/products?category=${category.id}`}
+                                href={`/products?category=${category.id}&page=1&per_page=${PAGINATION_LIMIT}`}
                                 className="block py-3 px-2 text-muted-foreground hover:text-primary transition-colors rounded-md hover:bg-accent/30 active:bg-accent/50 touch-manipulation touch-target"
                                 onClick={() => setIsOpen(false)}
                               >
@@ -733,12 +719,12 @@ export function Header() {
                             brands.map((brand) => (
                               <Link
                                 key={brand.id}
-                                href={`/products?brand=${brand.id}`}
+                                href={`/products?brand=${brand.id}&page=1&per_page=${PAGINATION_LIMIT}`}
                                 className="flex items-center py-3 px-2 text-muted-foreground hover:text-primary transition-colors rounded-md hover:bg-accent/30 active:bg-accent/50 touch-manipulation touch-target"
                                 onClick={(e) => {
                                   e.preventDefault();
                                   setIsOpen(false);
-                                  window.location.href = `/products?brand=${brand.id}`;
+                                  window.location.href = `/products?brand=${brand.id}&page=1&per_page=${PAGINATION_LIMIT}`;
                                 }}
                               >
                                 {brand.logo && (

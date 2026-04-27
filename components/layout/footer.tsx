@@ -91,7 +91,7 @@ export function Footer() {
               <h4 className="mb-3 font-semibold text-white">Follow Us</h4>
               <div className="flex space-x-3">
                 <Link
-                  href="https://www.facebook.com/koreanskincarebd01"
+                  href="https://www.facebook.com/share/171kJBukU7/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:bg-gray-800 p-2 rounded-full text-gray-400 hover:text-primary transition-all">
@@ -128,6 +128,17 @@ export function Footer() {
                     <Phone className="w-5 h-5" />
                   </Link>
                 </Button>
+              </div>
+              {/* Contact Info */}
+              <div className="space-y-1">
+                <p className="flex items-center text-gray-400">
+                  <Phone className="w-4 h-4 mr-2" />
+                  <span>+8801534554311</span>
+                </p>
+                <p className="flex items-center text-gray-400">
+                  <span className="mr-2">Address:</span>
+                  <span>Dhanmondi, Dhaka, Bangladesh</span>
+                </p>
               </div>
             </div>
           </div>

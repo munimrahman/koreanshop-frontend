@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     
     try {
       // Fetch current products from API with automatic revalidation
-      const response = await fetch('https://api.koreanskincareshopbd.com/api/v1/products', {
+      const response = await fetch('https://api.koreanskincareshopbd.com/api/v1/products/all', {
         headers: {
           'User-Agent': 'sitemap-generator',
           'Accept': 'application/json',

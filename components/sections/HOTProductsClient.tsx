@@ -8,6 +8,7 @@ import { QuickViewModal } from '../ui/quick-view-modal';
 import { useToast } from '@/hooks/use-toast';
 import { addToEnhancedCart } from '@/lib/api/cart';
 import { ProductsSection } from '../product/ProductSections';
+import { PAGINATION_LIMIT } from '@/constants/constants';
 
 interface HOTProductsClientProps {
   products: Product[];
@@ -143,7 +144,7 @@ export function HOTProductsClient({ products, error }: HOTProductsClientProps) {
 
           <div className="mt-12 text-center">
             <Button variant="outline" size="lg" asChild>
-              <Link href="/products">
+              <Link href={`/products?variationTags=HOT&page=1&per_page=${PAGINATION_LIMIT}`}>
                 View All Products
               </Link>
             </Button>

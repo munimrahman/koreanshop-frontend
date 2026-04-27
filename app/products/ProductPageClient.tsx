@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -54,15 +54,20 @@ import PriceRangeFilter from "@/components/product/PriceRange";
 export default function ProductsPageContent() {
   const searchParams = useSearchParams();
 
+  const router = useRouter();
+
   // State for data
   const [products, setProducts] = useState<Product[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [perPage] = useState(
+    Math.max(1, parseInt(searchParams?.get("per_page") || "48") || 48)
+  );
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 12,
+    limit: perPage,
     total: 0,
     totalPages: 0,
     hasNext: false,
@@ -79,22 +84,28 @@ export default function ProductsPageContent() {
   const [selectedBrand, setSelectedBrand] = useState(
     searchParams?.get("brand") || "all"
   );
+  const [variationTags, setVariationTags] = useState(
+    searchParams?.get("variationTags") || ""
+  );
 
-  // Update filter states when URL parameters change
-  useEffect(() => {
-    setSearchQuery(searchParams?.get("search") || "");
-    setSelectedCategory(searchParams?.get("category") || "all");
-    setSelectedBrand(searchParams?.get("brand") || "all");
-    setCurrentPage(1); // Reset to first page when filters change
-  }, [searchParams]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
   const [sortBy, setSortBy] = useState<"price" | "name" | "createdAt">(
     "createdAt"
   );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  // const [showFilters, setShowFilters] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(
+    Math.max(1, parseInt(searchParams?.get("page") || "1") || 1)
+  );
+
+  // Update filter states when URL parameters change
+  useEffect(() => {
+    setSearchQuery(searchParams?.get("search") || "");
+    setSelectedCategory(searchParams?.get("category") || "all");
+    setSelectedBrand(searchParams?.get("brand") || "all");
+    setVariationTags(searchParams?.get("variationTags") || "");
+    setCurrentPage(Math.max(1, parseInt(searchParams?.get("page") || "1") || 1));
+  }, [searchParams]);
 
   // Quick view modal state
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(
@@ -141,7 +152,7 @@ export default function ProductsPageContent() {
         // Build params object
         const params: GetProductsParams = {
           page: currentPage,
-          limit: pagination.limit,
+          limit: perPage,
           sortBy,
           sortOrder,
         };
@@ -160,6 +171,9 @@ export default function ProductsPageContent() {
         }
         if (searchQuery) {
           params.search = searchQuery;
+        }
+        if (variationTags) {
+          params.variationTags = variationTags;
         }
 
         // Fetch products using getProducts API
@@ -192,6 +206,7 @@ export default function ProductsPageContent() {
     sortBy,
     sortOrder,
     currentPage,
+    variationTags,
   ]);
 
   // Helper functions
@@ -322,6 +337,14 @@ export default function ProductsPageContent() {
     } finally {
       setAddingToCart(null);
     }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    const params = new URLSearchParams(searchParams?.toString() || "");
+    params.set("page", newPage.toString());
+    params.set("per_page", perPage.toString());
+    router.push(`/products?${params.toString()}`);
   };
 
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -853,7 +876,7 @@ export default function ProductsPageContent() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setCurrentPage(currentPage - 1)}
+                          onClick={() => handlePageChange(currentPage - 1)}
                           disabled={!pagination.hasPrev || loading}
                         >
                           Previous
@@ -866,7 +889,7 @@ export default function ProductsPageContent() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setCurrentPage(currentPage + 1)}
+                          onClick={() => handlePageChange(currentPage + 1)}
                           disabled={!pagination.hasNext || loading}
                         >
                           Next
@@ -877,7 +900,7 @@ export default function ProductsPageContent() {
                       <div className="hidden sm:flex justify-center items-center gap-2">
                         <Button
                           variant="outline"
-                          onClick={() => setCurrentPage(currentPage - 1)}
+                          onClick={() => handlePageChange(currentPage - 1)}
                           disabled={!pagination.hasPrev || loading}
                         >
                           Previous
@@ -898,7 +921,7 @@ export default function ProductsPageContent() {
                                       : "outline"
                                   }
                                   size="sm"
-                                  onClick={() => setCurrentPage(pageNum)}
+                                  onClick={() => handlePageChange(pageNum)}
                                   disabled={loading}
                                   className="w-10"
                                 >
@@ -922,7 +945,7 @@ export default function ProductsPageContent() {
                                 }
                                 size="sm"
                                 onClick={() =>
-                                  setCurrentPage(pagination.totalPages)
+                                  handlePageChange(pagination.totalPages)
                                 }
                                 disabled={loading}
                                 className="w-10"
@@ -951,7 +974,7 @@ export default function ProductsPageContent() {
                                           : "outline"
                                       }
                                       size="sm"
-                                      onClick={() => setCurrentPage(pageNum)}
+                                      onClick={() => handlePageChange(pageNum)}
                                       disabled={loading}
                                       className="w-10"
                                     >
@@ -970,7 +993,7 @@ export default function ProductsPageContent() {
                                   }
                                   size="sm"
                                   onClick={() =>
-                                    setCurrentPage(pagination.totalPages)
+                                    handlePageChange(pagination.totalPages)
                                   }
                                   disabled={loading}
                                   className="w-10"
@@ -1004,7 +1027,7 @@ export default function ProductsPageContent() {
                                             : "outline"
                                         }
                                         size="sm"
-                                        onClick={() => setCurrentPage(pageNum)}
+                                        onClick={() => handlePageChange(pageNum)}
                                         disabled={loading}
                                         className="w-10"
                                       >
@@ -1019,7 +1042,7 @@ export default function ProductsPageContent() {
 
                         <Button
                           variant="outline"
-                          onClick={() => setCurrentPage(currentPage + 1)}
+                          onClick={() => handlePageChange(currentPage + 1)}
                           disabled={!pagination.hasNext || loading}
                         >
                           Next

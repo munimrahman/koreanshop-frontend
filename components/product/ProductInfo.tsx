@@ -125,7 +125,7 @@ export function ProductInfo({
 
       if (res?.data?.cart?.items) {
         // handle pixel and conversion api
-        await fetch("/api/fb-conversion", {
+        fetch("/api/fb-conversion", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -135,7 +135,7 @@ export function ProductInfo({
             eventId: eventId,
             eventTime: fbEventTime,
           }),
-        });
+        }).catch(() => {});
 
         (window as any).fbq(
           "track",

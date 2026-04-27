@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Quote } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getReviews, getReviewStatistics, type Review, type ReviewsResponse, type ReviewStatistics } from '@/lib/api/review';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { getReviews, getReviewStatistics, type Review, type ReviewStatistics } from '@/lib/api/review';
 
 export function ReviewsSection() {
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -46,7 +45,7 @@ export function ReviewsSection() {
     if (reviews.length > 0) {
       const timer = setInterval(() => {
         setCurrentReview((prev) => (prev + 1) % reviews.length);
-      }, 4000);
+      }, 10000);
       return () => clearInterval(timer);
     }
   }, [reviews.length]);
@@ -142,7 +141,7 @@ export function ReviewsSection() {
         </div>
 
         <div className="mx-auto max-w-4xl">
-          <div className="relative h-80 md:h-64">
+          <div className="relative md:h-64">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentReview}
@@ -150,13 +149,13 @@ export function ReviewsSection() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -100 }}
                 transition={{ duration: 0.5 }}
-                className="absolute inset-0"
+                className="md:absolute md:inset-0"
               >
-                <Card className="border-primary-200 h-full glass-effect">
-                  <CardContent className="flex flex-col justify-center p-8 h-full">
+                <Card className="border-primary-200 h-auto md:h-full glass-effect">
+                  <CardContent className="flex flex-col justify-start md:justify-center p-5 sm:p-6 md:p-8 h-auto md:h-full">
                     <div className="mb-6 text-center">
                       <Quote className="mx-auto mb-4 w-8 h-8 text-primary-400" />
-                      <p className="text-gray-700 dark:text-gray-300 text-lg md:text-xl italic leading-relaxed">
+                      <p className="mx-auto max-w-3xl break-words text-gray-700 dark:text-gray-300 text-base sm:text-lg md:text-xl italic leading-relaxed">
                         "{reviews[currentReview].comment}"
                       </p>
                     </div>
@@ -172,7 +171,7 @@ export function ReviewsSection() {
                           <p className="font-semibold text-gray-900 dark:text-white">
                             {reviews[currentReview].customerName}
                           </p>
-                          <p className="text-muted-foreground text-sm">
+                          <p className="max-w-[17rem] sm:max-w-xs break-words text-muted-foreground text-sm">
                             {reviews[currentReview].productName}
                           </p>
                           <p className="text-muted-foreground text-xs">
