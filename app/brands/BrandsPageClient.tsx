@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { cloudfrontLoader } from "@/lib/cloudfront-loader";
 import Link from "next/link";
 import { Search, Grid, List, ShoppingBag, Eye, Package, Info, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,13 +29,29 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { getBrands, Brand } from "@/lib/api/brands";
 
-export default function BrandsPageContent() {
+interface BrandsPageContentProps {
+  initialBrands: Brand[];
+  initialPagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+}
+
+export default function BrandsPageContent({
+  initialBrands,
+  initialPagination,
+}: BrandsPageContentProps) {
   const searchParams = useSearchParams();
   const { toast } = useToast();
+  const isInitialRender = useRef(true);
 
   // State
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [brands, setBrands] = useState<Brand[]>(initialBrands);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState(
     searchParams?.get("search") || ""
@@ -44,17 +61,15 @@ export default function BrandsPageContent() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 20,
-    total: 0,
-    totalPages: 0,
-    hasNext: false,
-    hasPrev: false,
-  });
+  const [pagination, setPagination] = useState(initialPagination);
 
-  // Fetch brands
+  // Fetch brands — skip first run if server already provided data
   useEffect(() => {
+    if (isInitialRender.current && initialBrands.length > 0) {
+      isInitialRender.current = false;
+      return;
+    }
+    isInitialRender.current = false;
     const fetchBrands = async () => {
       try {
         setLoading(true);
@@ -152,6 +167,8 @@ export default function BrandsPageContent() {
                   src={brand.logoUrl}
                   alt={brand.name}
                   fill
+                  loader={cloudfrontLoader}
+                  sizes="64px"
                   className="object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
@@ -194,7 +211,7 @@ export default function BrandsPageContent() {
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
             <Button asChild className="golden-button flex-1">
-              <Link href={`/products?brand=${brand.id}`}>
+              <Link href={`/products?brand=${brand.slug || brand.id}`}>
                 <ShoppingBag className="mr-2 w-4 h-4" />
                 View All Products
               </Link>
@@ -211,19 +228,6 @@ export default function BrandsPageContent() {
       </DialogContent>
     </Dialog>
   );
-
-  if (loading && brands.length === 0) {
-    return (
-      <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 container">
-          <div className="text-center">
-            <div className="mx-auto mb-4 border-primary-600 border-b-2 rounded-full w-12 h-12 animate-spin"></div>
-            <p className="text-muted-foreground">Loading brands...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
@@ -348,6 +352,8 @@ export default function BrandsPageContent() {
                                   src={brand.logoUrl}
                                   alt={brand.name}
                                   fill
+                                  loader={cloudfrontLoader}
+                                  sizes="80px"
                                   className="object-cover"
                                   onError={(e) => {
                                     const target = e.target as HTMLImageElement;
@@ -414,7 +420,7 @@ export default function BrandsPageContent() {
                               asChild
                               className="golden-button flex-1"
                             >
-                              <Link href={`/products?brand=${brand.id}`}>
+                              <Link href={`/products?brand=${brand.slug || brand.id}`}>
                                 <ShoppingBag className="mr-2 w-4 h-4" />
                                 View Products
                               </Link>
@@ -448,6 +454,8 @@ export default function BrandsPageContent() {
                                 src={brand.logoUrl}
                                 alt={brand.name}
                                 fill
+                                loader={cloudfrontLoader}
+                                sizes="(max-width: 640px) 64px, 80px"
                                 className="object-cover"
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement;
@@ -523,7 +531,7 @@ export default function BrandsPageContent() {
                                       asChild
                                       className="golden-button"
                                     >
-                                      <Link href={`/products?brand=${brand.id}`}>
+                                      <Link href={`/products?brand=${brand.slug || brand.id}`}>
                                         <ShoppingBag className="mr-2 w-4 h-4" />
                                         <span className="hidden sm:inline">View Products</span>
                                         <span className="sm:hidden">Products</span>

@@ -2,6 +2,20 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Truck, MapPin, Clock, Package, CreditCard, AlertCircle } from 'lucide-react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Shipping & Delivery | Korean Skincare Shop BD',
+  description: 'Learn about our shipping rates, delivery options, and policies. Get your Korean skincare products delivered fast across Dhaka and Bangladesh.',
+  keywords: ['shipping', 'delivery', 'shipping rates', 'fast delivery Bangladesh', 'K-beauty delivery'],
+  openGraph: {
+    title: 'Shipping & Delivery Information',
+    description: 'Fast and reliable shipping across Bangladesh.',
+    url: 'https://www.koreanskincareshopbd.com/shipping',
+    type: 'website',
+    images: [{ url: '/logo2.png', width: 1200, height: 630, alt: 'Shipping Information' }],
+  },
+};
 
 const ShippingInfoPage: React.FC = () => {
   return (

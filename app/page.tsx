@@ -22,7 +22,7 @@ export const metadata: Metadata = {
       "Discover authentic Korean skincare and beauty products in Bangladesh. Shop premium K-beauty essentials with fast delivery.",
     images: [
       {
-        url: "/logo.png",
+        url: "/logo2.png",
         width: 1200,
         height: 630,
         alt: "Korean Skincare Shop BD",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     title: "Korean Skincare Shop BD - Premium Korean Beauty Products",
     description:
       "Discover authentic Korean skincare and beauty products in Bangladesh.",
-    images: ["/logo.png"],
+    images: ["/logo2.png"],
   },
   alternates: {
     canonical: "/",

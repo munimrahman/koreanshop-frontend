@@ -3,6 +3,9 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 export interface Product {
   id: string;
   name: string;
+  slug?: string;
+  metaTitle?: string;
+  metaDescription?: string;
   description?: string;
   categoryId?: string;
   brandId?: string;
@@ -15,11 +18,13 @@ export interface Product {
   category?: {
     id: string;
     name: string;
+    slug?: string;
     description?: string;
   };
   brand?: {
     id: string;
     name: string;
+    slug?: string;
     logoUrl?: string;
     description?: string;
   };
@@ -75,6 +80,9 @@ export interface CreateProductRequest {
   volume?: string;
   weightGrams?: number;
   description?: string;
+  slug?: string;
+  metaTitle?: string;
+  metaDescription?: string;
   categoryId?: string;
   brandId?: string;
   tags?: string;
@@ -580,6 +588,9 @@ export const deleteProductImage = async (
 export interface UpdateProductRequest {
   name?: string;
   description?: string;
+  slug?: string;
+  metaTitle?: string;
+  metaDescription?: string;
   categoryId?: string;
   brandId?: string;
   tags?: string[];

@@ -3,7 +3,10 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 export interface Category {
     id: string;
     name: string;
+    slug?: string;
     description?: string;
+    metaTitle?: string;
+    metaDescription?: string;
     parentId?: string;
     imageUrl?: string;
     isActive?: boolean;
@@ -14,6 +17,9 @@ export interface Category {
 export interface CreateCategoryRequest {
     name: string;
     description?: string;
+    slug?: string;
+    metaTitle?: string;
+    metaDescription?: string;
     parentId?: string;
     image?: File;
 }

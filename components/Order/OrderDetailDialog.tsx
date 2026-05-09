@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Order } from "@/lib/api/orders";
 import { Badge } from "../ui/badge";
 import Image from "next/image";
+import { cloudfrontLoader } from "@/lib/cloudfront-loader";
 
 const ORDER_STATUSES = {
   PENDING: "PENDING",
@@ -224,6 +225,8 @@ export const OrderDetailDialog = ({
                                 }
                                 alt={item.productName}
                                 fill
+                                loader={cloudfrontLoader}
+                                sizes="40px"
                                 className="object-cover"
                               />
                             </div>

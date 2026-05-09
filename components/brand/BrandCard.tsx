@@ -3,17 +3,19 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
+import { cloudfrontLoader } from '@/lib/cloudfront-loader';
 
 interface BrandCardProps {
   id: string;
+  slug?: string;
   name: string;
   logoUrl: string | null;
 }
 
-export function BrandCard({ id, name, logoUrl }: BrandCardProps) {
+export function BrandCard({ id, slug, name, logoUrl }: BrandCardProps) {
   return (
     <Link
-      href={`/products?brand=${id}`}
+      href={`/products?brand=${slug || id}`}
       className="group flex-shrink-0"
     >
       <div className="relative bg-white shadow-lg group-hover:shadow-xl rounded-xl w-32 md:w-40 h-32 md:h-40 overflow-hidden group-hover:scale-105 transition-all duration-300">
@@ -24,9 +26,10 @@ export function BrandCard({ id, name, logoUrl }: BrandCardProps) {
               src={logoUrl || '/placeholder-brand-logo.png'}
               alt={name}
               fill
+              loader={cloudfrontLoader}
+              sizes="(max-width: 768px) 64px, 80px"
               className="rounded-lg object-cover"
               onError={(e) => {
-                // Fallback to placeholder if image fails to load
                 const target = e.target as HTMLImageElement;
                 target.src = '/placeholder-brand-logo.png';
               }}

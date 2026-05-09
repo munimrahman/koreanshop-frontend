@@ -9,26 +9,30 @@ import { ProductTabsWrapper } from "@/components/product/ProductTabsWrapper";
 import { RelatedProducts } from "@/components/product/RelatedProduct";
 import { ProductLoadingState } from "@/components/product/ProductLoadingState";
 import { ProductErrorState } from "@/components/product/ProductErrorState";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import PageViewEvent from "@/components/PixelComponent/PageViewEvent";
-import { generateEventId } from "@/lib/utils";
+import { generateEventId, BASE_URL } from "@/lib/utils";
 
 // Pre-render all existing product pages at build time.
 // New products added after build are rendered on first visit and then cached.
 export const revalidate = 600;
 
+const CUID_RE = /^c[a-z0-9]{24}$/;
+
 export async function generateStaticParams() {
   try {
     const result = await getProducts({ limit: 200, page: 1 });
-    return result.products.map((p: { id: string }) => ({ id: p.id }));
+    return result.products.map((p: { id: string; slug?: string }) => ({
+      slug: p.slug || p.id,
+    }));
   } catch {
     return [];
   }
 }
 
 interface ProductPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 // Generate metadata for SEO
@@ -37,14 +41,18 @@ export async function generateMetadata({
 }: ProductPageProps): Promise<Metadata> {
   try {
     const resolvedParams = await params;
-    const product = await getProduct(resolvedParams.id);
+    const product = await getProduct(resolvedParams.slug);
 
     const currentVariation = product.variations[0];
     const price = currentVariation.salePrice || currentVariation.price;
+    const canonicalSlug = product.slug || product.id;
 
     return {
-      title: `${product.name} - ${product.brand?.name || "Korean Skincare"}`,
+      title:
+        product.metaTitle ||
+        `${product.name} - ${product.brand?.name || "Korean Skincare"}`,
       description:
+        product.metaDescription ||
         product.description ||
         `${product.name} by ${product.brand?.name}. High-quality Korean skincare product.`,
       keywords: [
@@ -58,9 +66,13 @@ export async function generateMetadata({
         .filter(Boolean)
         .join(", "),
       openGraph: {
-        title: `${product.name} - ${product.brand?.name || "Korean Skincare"}`,
+        title:
+          product.metaTitle ||
+          `${product.name} - ${product.brand?.name || "Korean Skincare"}`,
         description:
-          product.description || `${product.name} by ${product.brand?.name}`,
+          product.metaDescription ||
+          product.description ||
+          `${product.name} by ${product.brand?.name}`,
         images: [
           {
             url: product.baseImageUrl || "/placeholder.jpg",
@@ -73,13 +85,17 @@ export async function generateMetadata({
       },
       twitter: {
         card: "summary_large_image",
-        title: `${product.name} - ${product.brand?.name || "Korean Skincare"}`,
+        title:
+          product.metaTitle ||
+          `${product.name} - ${product.brand?.name || "Korean Skincare"}`,
         description:
-          product.description || `${product.name} by ${product.brand?.name}`,
+          product.metaDescription ||
+          product.description ||
+          `${product.name} by ${product.brand?.name}`,
         images: [product.baseImageUrl || "/placeholder.jpg"],
       },
       alternates: {
-        canonical: `/products/${resolvedParams.id}`,
+        canonical: `/products/${canonicalSlug}`,
       },
       other: {
         "product:price:amount": price?.toString() || "0",
@@ -99,10 +115,18 @@ export async function generateMetadata({
   }
 }
 
-async function ProductData({ id }: { id: string }) {
+async function ProductData({ slug }: { slug: string }) {
   try {
+    // If the URL still uses the old CUID format, redirect to the slug URL
+    if (CUID_RE.test(slug)) {
+      const product = await getProduct(slug);
+      if (product?.slug) {
+        redirect(`/products/${product.slug}`);
+      }
+    }
+
     // Fetch product data server-side
-    const product = await getProduct(id);
+    const product = await getProduct(slug);
 
     if (!product) {
       notFound();
@@ -117,15 +141,15 @@ async function ProductData({ id }: { id: string }) {
           ) / product.reviews.length
         : 0;
 
-    // Fetch related products server-side
+    // Fetch related products server-side using slugs when available
     const [relatedByCategory, relatedByBrand] = await Promise.all([
       getProducts({
         limit: 3,
-        category: product.category?.id,
+        category: product.category?.slug || product.category?.id,
       }),
       getProducts({
         limit: 3,
-        brand: product.brand?.id,
+        brand: product.brand?.slug || product.brand?.id,
       }),
     ]);
 
@@ -158,7 +182,102 @@ async function ProductData({ id }: { id: string }) {
         )
       : 0;
 
+    const canonicalSlug = product.slug || product.id;
+    const productUrl = `${BASE_URL}/products/${canonicalSlug}`;
+    const price = Number(currentVariation.salePrice || currentVariation.price);
+    const allImages = [
+      product.baseImageUrl,
+      ...product.images.map((img: { imageUrl: string }) => img.imageUrl),
+    ].filter(Boolean);
+
+    const productSchema: Record<string, unknown> = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: product.name,
+      description: product.description || product.metaDescription || undefined,
+      image: allImages,
+      sku: product.id,
+      brand: product.brand?.name
+        ? { "@type": "Brand", name: product.brand.name }
+        : undefined,
+      offers: {
+        "@type": "Offer",
+        price: price.toFixed(2),
+        priceCurrency: "BDT",
+        availability:
+          currentVariation.stockQuantity > 0
+            ? "https://schema.org/InStock"
+            : "https://schema.org/OutOfStock",
+        itemCondition: "https://schema.org/NewCondition",
+        url: productUrl,
+        seller: {
+          "@type": "Organization",
+          name: "Korean Skincare Shop BD",
+        },
+      },
+    };
+
+    if (product.reviews && product.reviews.length > 0) {
+      productSchema.aggregateRating = {
+        "@type": "AggregateRating",
+        ratingValue: averageRating.toFixed(1),
+        reviewCount: product.reviews.length,
+        bestRating: 5,
+        worstRating: 1,
+      };
+      productSchema.review = product.reviews
+        .slice(0, 5)
+        .map((r: { rating: number; customerName: string; comment?: string }) => ({
+          "@type": "Review",
+          reviewRating: {
+            "@type": "Rating",
+            ratingValue: r.rating,
+            bestRating: 5,
+          },
+          author: { "@type": "Person", name: r.customerName },
+          ...(r.comment ? { reviewBody: r.comment } : {}),
+        }));
+    }
+
+    const breadcrumbItems: Array<Record<string, unknown>> = [
+      { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Products",
+        item: `${BASE_URL}/products`,
+      },
+    ];
+    if (product.category?.name) {
+      breadcrumbItems.push({
+        "@type": "ListItem",
+        position: 3,
+        name: product.category.name,
+        item: `${BASE_URL}/products?category=${product.category.slug || product.category.id}`,
+      });
+    }
+    breadcrumbItems.push({
+      "@type": "ListItem",
+      position: breadcrumbItems.length + 1,
+      name: product.name,
+    });
+
+    const breadcrumbSchema = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: breadcrumbItems,
+    };
+
     return (
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        />
       <div className="bg-white dark:bg-gray-900 min-h-screen">
         <div className="mx-auto px-4 py-3 container">
           {/* Breadcrumb Navigation */}
@@ -172,7 +291,7 @@ async function ProductData({ id }: { id: string }) {
             </Link>
             <span>/</span>
             <Link
-              href={`/products?category=${product.category?.id}`}
+              href={`/products?category=${product.category?.slug || product.category?.id}`}
               className="hover:text-primary"
             >
               {product.category?.name
@@ -230,6 +349,7 @@ async function ProductData({ id }: { id: string }) {
         </div>
         {/* <PageViewEvent eventName="ViewContent" /> */}
       </div>
+      </>
     );
   } catch (error) {
     return <ProductErrorState error="Failed to load product" />;
@@ -241,7 +361,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
   return (
     <Suspense fallback={<ProductLoadingState />}>
-      <ProductData id={resolvedParams.id} />
+      <ProductData slug={resolvedParams.slug} />
     </Suspense>
   );
 }

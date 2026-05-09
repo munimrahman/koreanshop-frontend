@@ -47,12 +47,14 @@ import { useToast } from "@/hooks/use-toast";
 import { getEnhancedCart } from "@/lib/api/cart";
 import { getSessionIdCookie } from "@/lib/cookies/session";
 import Image from "next/image";
+import { cloudfrontLoader } from "@/lib/cloudfront-loader";
 import useFbIds from "@/hooks/useFbIds";
 import { PAGINATION_LIMIT } from "@/constants/constants";
 
 // Type definitions
 interface Brand {
   id: string;
+  slug?: string;
   name: string;
   logo: string;
   description: string;
@@ -60,6 +62,7 @@ interface Brand {
 
 interface Category {
   id: string;
+  slug?: string;
   name: string;
   description: string;
   parentId?: string;
@@ -387,6 +390,7 @@ export function Header() {
                 src="/logo1.png"
                 width={75}
                 height={75}
+                loader={cloudfrontLoader}
                 alt="Korean Skincare Shop BD Logo"
                 className="pt-1 w-20 h-19 object-contain"
               />
@@ -415,7 +419,7 @@ export function Header() {
                       categories.map((category) => (
                         <NavigationMenuLink key={category.id} asChild>
                           <Link
-                            href={`/products?category=${category.id}&page=1&per_page=${PAGINATION_LIMIT}`}
+                            href={`/products?category=${category.slug || category.id}&page=1&per_page=${PAGINATION_LIMIT}`}
                             className="block space-y-1 hover:bg-accent focus:bg-accent p-3 rounded-md outline-none no-underline leading-none transition-colors hover:text-accent-foreground focus:text-accent-foreground select-none"
                           >
                             <div className="font-medium text-sm leading-none">
@@ -461,7 +465,7 @@ export function Header() {
                       brands.map((brand) => (
                         <NavigationMenuLink key={brand.id} asChild>
                           <Link
-                            href={`/products?brand=${brand.id}&page=1&per_page=${PAGINATION_LIMIT}`}
+                            href={`/products?brand=${brand.slug || brand.id}&page=1&per_page=${PAGINATION_LIMIT}`}
                             className="block space-y-1 hover:bg-accent focus:bg-accent p-3 rounded-md outline-none no-underline leading-none transition-colors hover:text-accent-foreground focus:text-accent-foreground select-none"
                           >
                             <div className="flex items-center space-x-2">
@@ -472,6 +476,7 @@ export function Header() {
                                   alt={brand.name}
                                   width={24}
                                   height={24}
+                                  loader={cloudfrontLoader}
                                   className="rounded w-6 h-6 object-cover"
                                   onError={(e) => {
                                     e.currentTarget.style.display = "none";
@@ -680,7 +685,7 @@ export function Header() {
                             categories.map((category) => (
                               <Link
                                 key={category.id}
-                                href={`/products?category=${category.id}&page=1&per_page=${PAGINATION_LIMIT}`}
+                                href={`/products?category=${category.slug || category.id}&page=1&per_page=${PAGINATION_LIMIT}`}
                                 className="block py-3 px-2 text-muted-foreground hover:text-primary transition-colors rounded-md hover:bg-accent/30 active:bg-accent/50 touch-manipulation touch-target"
                                 onClick={() => setIsOpen(false)}
                               >
@@ -719,12 +724,12 @@ export function Header() {
                             brands.map((brand) => (
                               <Link
                                 key={brand.id}
-                                href={`/products?brand=${brand.id}&page=1&per_page=${PAGINATION_LIMIT}`}
+                                href={`/products?brand=${brand.slug || brand.id}&page=1&per_page=${PAGINATION_LIMIT}`}
                                 className="flex items-center py-3 px-2 text-muted-foreground hover:text-primary transition-colors rounded-md hover:bg-accent/30 active:bg-accent/50 touch-manipulation touch-target"
                                 onClick={(e) => {
                                   e.preventDefault();
                                   setIsOpen(false);
-                                  window.location.href = `/products?brand=${brand.id}&page=1&per_page=${PAGINATION_LIMIT}`;
+                                  window.location.href = `/products?brand=${brand.slug || brand.id}&page=1&per_page=${PAGINATION_LIMIT}`;
                                 }}
                               >
                                 {brand.logo && (
@@ -733,6 +738,7 @@ export function Header() {
                                     alt={brand.name}
                                     width={16}
                                     height={16}
+                                    loader={cloudfrontLoader}
                                     className="mr-2 rounded w-4 h-4 object-cover flex-shrink-0"
                                     onError={(e) => {
                                       e.currentTarget.style.display = "none";

@@ -70,6 +70,9 @@ export function BrandsManager() {
   const [formData, setFormData] = useState<CreateBrandRequest>({
     name: "",
     description: "",
+    slug: "",
+    metaTitle: "",
+    metaDescription: "",
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -152,6 +155,9 @@ export function BrandsManager() {
     setFormData({
       name: brand.name,
       description: brand.description || "",
+      slug: brand.slug || "",
+      metaTitle: brand.metaTitle || "",
+      metaDescription: brand.metaDescription || "",
     });
     setLogoPreview(brand.logoUrl || null);
     setLogoFile(null);
@@ -178,6 +184,9 @@ export function BrandsManager() {
     setFormData({
       name: "",
       description: "",
+      slug: "",
+      metaTitle: "",
+      metaDescription: "",
     });
     setEditingBrand(null);
     setLogoFile(null);
@@ -264,6 +273,51 @@ export function BrandsManager() {
                   }
                   placeholder="Enter brand description"
                   rows={3}
+                  className="mt-1 resize-none"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="brand-slug (Leave blank to auto-generate)" className="font-medium text-sm">URL Slug</Label>
+                <div className="flex items-center mt-1">
+                  <span className="inline-flex items-center px-2 border border-r-0 border-input rounded-l-md bg-muted text-muted-foreground text-xs h-10">?brand=</span>
+                  <Input
+                    id="brand-slug (Leave blank to auto-generate)"
+                    className="rounded-l-none"
+                    value={formData.slug || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-') }))}
+                    placeholder="brand-slug (Leave blank to auto-generate)"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="brand-metaTitle" className="font-medium text-sm">Meta Title</Label>
+                  <span className="text-muted-foreground text-xs">{(formData.metaTitle || '').length}/60</span>
+                </div>
+                <Input
+                  id="brand-metaTitle"
+                  value={formData.metaTitle || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, metaTitle: e.target.value }))}
+                  placeholder="Leave blank to use brand name"
+                  maxLength={60}
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="brand-metaDescription" className="font-medium text-sm">Meta Description</Label>
+                  <span className="text-muted-foreground text-xs">{(formData.metaDescription || '').length}/160</span>
+                </div>
+                <Textarea
+                  id="brand-metaDescription"
+                  value={formData.metaDescription || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, metaDescription: e.target.value }))}
+                  placeholder="Leave blank to use brand description"
+                  rows={2}
+                  maxLength={160}
                   className="mt-1 resize-none"
                 />
               </div>

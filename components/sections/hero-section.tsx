@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { cloudfrontLoader } from "@/lib/cloudfront-loader";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -178,13 +179,11 @@ export function HeroSection() {
                   src={banner.imageUrl}
                   alt={banner.cta || "Banner image"}
                   fill
+                  loader={cloudfrontLoader}
                   className="object-cover cursor-pointer"
                   priority={index === 0}
                   loading={index === 0 ? "eager" : "lazy"}
-                  quality={90}
                   sizes="100vw"
-                  placeholder="blur"
-                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAASABoDASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAAQHBv/EAB8QAAMAAQQDAQAAAAAAAAAAAAABAgMFBBIhMQcyQRP/xAAVAQEBAAAAAAAAAAAAAAAAAAABAgP/xAAZEQADAQEBAAAAAAAAAAAAAAAAAQIDITH/2gAMAwEAAhEDEQA/AMkbNi7PSfTZ2/cKu5fhXsXNp8fhFyNEpyqlRJ4W6FZ2JR7HHhcBP2D6FEf/2Q=="
                 />
               ) : (
                 <div className={`w-full h-full bg-gradient-to-br ${banner.gradient} flex items-center justify-center`}>

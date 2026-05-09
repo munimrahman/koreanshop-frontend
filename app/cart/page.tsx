@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { cloudfrontLoader } from "@/lib/cloudfront-loader";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -377,6 +378,8 @@ export default function CartPage() {
                               "Product"
                             }
                             fill
+                            loader={cloudfrontLoader}
+                            sizes="(max-width: 640px) 100vw, 96px"
                             className="rounded-lg object-cover"
                           />
                         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -51,28 +51,40 @@ import { useToast } from "@/hooks/use-toast";
 import { ProductsSection } from "@/components/product/ProductSections";
 import PriceRangeFilter from "@/components/product/PriceRange";
 
-export default function ProductsPageContent() {
+interface ProductsPageContentProps {
+  initialProducts: Product[];
+  initialBrands: Brand[];
+  initialCategories: Category[];
+  initialPagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+}
+
+export default function ProductsPageContent({
+  initialProducts,
+  initialBrands,
+  initialCategories,
+  initialPagination,
+}: ProductsPageContentProps) {
   const searchParams = useSearchParams();
 
   const router = useRouter();
 
   // State for data
-  const [products, setProducts] = useState<Product[]>([]);
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [brands, setBrands] = useState<Brand[]>(initialBrands);
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [perPage] = useState(
     Math.max(1, parseInt(searchParams?.get("per_page") || "48") || 48)
   );
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: perPage,
-    total: 0,
-    totalPages: 0,
-    hasNext: false,
-    hasPrev: false,
-  });
+  const [pagination, setPagination] = useState(initialPagination);
 
   // State for filters
   const [searchQuery, setSearchQuery] = useState(
@@ -122,9 +134,11 @@ export default function ProductsPageContent() {
     price: false,
   });
   const { toast } = useToast();
+  const isInitialRender = useRef(true);
 
-  // Fetch initial data (brands and categories)
+  // Fetch initial data (brands and categories) — skip if server already provided them
   useEffect(() => {
+    if (initialBrands.length > 0 && initialCategories.length > 0) return;
     const fetchInitialData = async () => {
       try {
         const [brandsResponse, categoriesResponse] = await Promise.all([
@@ -143,8 +157,13 @@ export default function ProductsPageContent() {
     fetchInitialData();
   }, []);
 
-  // Fetch products based on filters
+  // Fetch products based on filters — skip first run if server already provided data
   useEffect(() => {
+    if (isInitialRender.current && initialProducts.length > 0) {
+      isInitialRender.current = false;
+      return;
+    }
+    isInitialRender.current = false;
     const fetchProducts = async () => {
       try {
         setLoading(true);
@@ -470,19 +489,6 @@ export default function ProductsPageContent() {
     </div>
   );
 
-  if (loading && products.length === 0) {
-    return (
-      <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 container">
-          <div className="text-center">
-            <div className="mx-auto mb-4 border-primary-600 border-b-2 rounded-full w-12 h-12 animate-spin"></div>
-            <p className="text-muted-foreground">Loading products...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <>
       <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
@@ -703,7 +709,7 @@ export default function ProductsPageContent() {
                               <CardContent className="p-4 sm:p-6">
                                 <div className="flex gap-4 sm:gap-6">
                                   <div className="relative flex-shrink-0 w-20 sm:w-32 h-20 sm:h-32">
-                                    <Link href={`/products/${product.id}`}>
+                                    <Link href={`/products/${product.slug || product.id}`}>
                                       <Image
                                         src={mainImageUrl}
                                         alt={product.name}
@@ -749,7 +755,7 @@ export default function ProductsPageContent() {
                                         </p>
                                         <h3 className="font-semibold text-sm sm:text-lg line-clamp-2">
                                           <Link
-                                            href={`/products/${product.id}`}
+                                            href={`/products/${product.slug || product.id}`}
                                             className="hover:text-primary transition-colors"
                                           >
                                             {product.name}

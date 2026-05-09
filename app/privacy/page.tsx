@@ -2,6 +2,24 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Shield, Eye, Lock, Database, Users, Mail } from 'lucide-react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy | Korean Skincare Shop BD',
+  description: 'Read our privacy policy to understand how we collect, use, and protect your personal information at Korean Skincare Shop BD.',
+  keywords: ['privacy policy', 'data protection', 'GDPR', 'personal information'],
+  openGraph: {
+    title: 'Privacy Policy',
+    description: 'Learn how we protect your personal information.',
+    url: 'https://www.koreanskincareshopbd.com/privacy',
+    type: 'website',
+    images: [{ url: '/logo2.png', width: 1200, height: 630, alt: 'Privacy Policy' }],
+  },
+  robots: {
+    index: false,
+    follow: true,
+  },
+};
 
 const PrivacyPolicyPage: React.FC = () => {
   return (

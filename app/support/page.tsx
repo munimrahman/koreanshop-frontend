@@ -13,6 +13,20 @@ import {
   ChevronRight,
   Star
 } from 'lucide-react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Customer Support & Help | Korean Skincare Shop BD',
+  description: 'Contact Korean Skincare Shop BD customer support. Get help with FAQs, live chat, email, and phone support for all your K-beauty skincare questions.',
+  keywords: ['customer support', 'help center', 'FAQs', 'contact support', 'Korean skincare help'],
+  openGraph: {
+    title: 'Customer Support Center',
+    description: 'Get help and support for your Korean skincare purchases.',
+    url: 'https://www.koreanskincareshopbd.com/support',
+    type: 'website',
+    images: [{ url: '/logo2.png', width: 1200, height: 630, alt: 'Customer Support' }],
+  },
+};
 
 const CustomerSupportPage: React.FC = () => {
   const faqs = [
@@ -41,7 +55,7 @@ const CustomerSupportPage: React.FC = () => {
     },
     {
       icon: <MessageSquare className="w-6 h-6" />,
-      title: "Live Chat",
+      title: "Whatsapp or Messenger Chat",
       description: "Get instant help through live chat",
       contact: "Available on website",
       availability: "9 AM - 11 PM (Daily)",
@@ -99,26 +113,6 @@ const CustomerSupportPage: React.FC = () => {
             </div>
           </section>
 
-          {/* Quick Help */}
-          <section className="bg-muted/50 p-8 rounded-lg">
-            <h2 className="mb-6 font-semibold text-foreground text-2xl text-center">Quick Help</h2>
-            <div className="gap-4 grid md:grid-cols-2 lg:grid-cols-4">
-              {[
-                { title: "Track Order", description: "Check your order status", icon: "📦" },
-                { title: "Return Item", description: "Start a return process", icon: "🔄" },
-                { title: "Update Address", description: "Change delivery details", icon: "📍" },
-                { title: "Payment Help", description: "Billing and payment support", icon: "💳" }
-              ].map((item, index) => (
-                <div key={index} className="bg-background hover:shadow-md p-4 border border-border rounded-lg transition-shadow cursor-pointer">
-                  <div className="mb-2 text-2xl">{item.icon}</div>
-                  <h3 className="mb-1 font-medium text-foreground">{item.title}</h3>
-                  <p className="text-muted-foreground text-sm">{item.description}</p>
-                  <ChevronRight className="mt-2 w-4 h-4 text-muted-foreground" />
-                </div>
-              ))}
-            </div>
-          </section>
-
           {/* FAQ Search */}
           <section>
             <h2 className="mb-6 font-semibold text-foreground text-2xl text-center">Frequently Asked Questions</h2>
@@ -153,139 +147,6 @@ const CustomerSupportPage: React.FC = () => {
               ))}
             </div>
           </section>
-
-          {/* Contact Form */}
-          <section className="bg-muted/50 p-8 rounded-lg">
-            <div className="mx-auto max-w-2xl">
-              <h2 className="mb-6 font-semibold text-foreground text-2xl text-center">Still Need Help?</h2>
-              <form className="space-y-6">
-                <div className="gap-4 grid md:grid-cols-2">
-                  <div>
-                    <label className="block mb-2 font-medium text-foreground text-sm">Name</label>
-                    <input
-                      type="text"
-                      className="bg-background px-3 py-2 border focus:border-transparent border-border rounded-lg focus:ring-2 focus:ring-primary w-full text-foreground"
-                      placeholder="Your full name"
-                    />
-                  </div>
-                  <div>
-                    <label className="block mb-2 font-medium text-foreground text-sm">Email</label>
-                    <input
-                      type="email"
-                      className="bg-background px-3 py-2 border focus:border-transparent border-border rounded-lg focus:ring-2 focus:ring-primary w-full text-foreground"
-                      placeholder="your@email.com"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block mb-2 font-medium text-foreground text-sm">Order Number (Optional)</label>
-                  <input
-                    type="text"
-                    className="bg-background px-3 py-2 border focus:border-transparent border-border rounded-lg focus:ring-2 focus:ring-primary w-full text-foreground"
-                    placeholder="Enter your order number if applicable"
-                  />
-                </div>
-                <div>
-                  <label className="block mb-2 font-medium text-foreground text-sm">How can we help?</label>
-                  <textarea
-                    rows={4}
-                    className="bg-background px-3 py-2 border focus:border-transparent border-border rounded-lg focus:ring-2 focus:ring-primary w-full text-foreground resize-none"
-                    placeholder="Describe your issue or question in detail..."
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="bg-primary hover:bg-primary/90 py-3 rounded-lg w-full font-medium text-primary-foreground transition-colors"
-                >
-                  Send Support Request
-                </button>
-              </form>
-            </div>
-          </section>
-
-          {/* Support Hours */}
-          <section className="p-6 border border-border rounded-lg">
-            <h2 className="flex justify-center items-center gap-2 mb-4 font-semibold text-foreground text-xl text-center">
-              <Clock className="w-5 h-5" />
-              Support Hours
-            </h2>
-            <div className="gap-6 grid md:grid-cols-2">
-              <div>
-                <h3 className="mb-3 font-medium text-foreground">Phone & Live Chat</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Monday - Friday:</span>
-                    <span className="text-foreground">9:00 AM - 9:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Saturday:</span>
-                    <span className="text-foreground">10:00 AM - 8:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Sunday:</span>
-                    <span className="text-foreground">10:00 AM - 6:00 PM</span>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <h3 className="mb-3 font-medium text-foreground">Email Support</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Response Time:</span>
-                    <span className="text-foreground">Within 6 hours</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Availability:</span>
-                    <span className="text-foreground">24/7</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Priority Support:</span>
-                    <span className="text-foreground">Premium members</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Customer Reviews */}
-          {/* <section className="text-center">
-            <h2 className="mb-6 font-semibold text-foreground text-2xl">What Our Customers Say</h2>
-            <div className="gap-6 grid md:grid-cols-3">
-              {[
-                {
-                  name: "Sarah Ahmed",
-                  rating: 5,
-                  comment: "Excellent customer service! They resolved my issue within minutes.",
-                  location: "Dhaka"
-                },
-                {
-                  name: "Mohammad Rahman",
-                  rating: 5,
-                  comment: "Very helpful support team. They guided me through the return process.",
-                  location: "Chittagong"
-                },
-                {
-                  name: "Fatima Khan",
-                  rating: 5,
-                  comment: "Quick response and professional service. Highly recommended!",
-                  location: "Sylhet"
-                }
-              ].map((review, index) => (
-                <div key={index} className="bg-muted/50 p-6 rounded-lg">
-                  <div className="flex justify-center mb-3">
-                    {[...Array(review.rating)].map((_, i) => (
-                      <Star key={i} className="fill-current w-4 h-4 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="mb-4 text-muted-foreground text-sm italic">"{review.comment}"</p>
-                  <div className="text-center">
-                    <p className="font-medium text-foreground">{review.name}</p>
-                    <p className="text-muted-foreground text-xs">{review.location}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section> */}
 
           {/* Emergency Contact */}
           <section className="bg-red-50 dark:bg-red-950/20 p-6 border border-red-200 dark:border-red-800 rounded-lg text-center">

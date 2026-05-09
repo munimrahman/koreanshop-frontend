@@ -106,6 +106,9 @@ export default function EditProduct() {
       setFormData({
         name: productData.name,
         description: productData.description || "",
+        slug: productData.slug || "",
+        metaTitle: productData.metaTitle || "",
+        metaDescription: productData.metaDescription || "",
         categoryId: productData.categoryId,
         brandId: productData.brandId,
         tags: productData.tags || [],
@@ -916,6 +919,55 @@ export default function EditProduct() {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* SEO Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle>SEO Settings</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="slug">URL Slug</Label>
+                <div className="flex items-center mt-1">
+                  <span className="inline-flex items-center px-3 border border-r-0 border-input rounded-l-md bg-muted text-muted-foreground text-sm h-10">/products/</span>
+                  <Input
+                    id="slug"
+                    className="rounded-l-none"
+                    value={formData.slug || ""}
+                    onChange={(e) => handleInputChange("slug", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-"))}
+                    placeholder="product-url-slug (Leave blank to auto-generate)"
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="metaTitle">Meta Title</Label>
+                  <span className="text-muted-foreground text-xs">{(formData.metaTitle || "").length}/60</span>
+                </div>
+                <Input
+                  id="metaTitle"
+                  value={formData.metaTitle || ""}
+                  onChange={(e) => handleInputChange("metaTitle", e.target.value)}
+                  placeholder="Leave blank to use product name"
+                  maxLength={60}
+                />
+              </div>
+              <div>
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="metaDescription">Meta Description</Label>
+                  <span className="text-muted-foreground text-xs">{(formData.metaDescription || "").length}/160</span>
+                </div>
+                <Textarea
+                  id="metaDescription"
+                  value={formData.metaDescription || ""}
+                  onChange={(e) => handleInputChange("metaDescription", e.target.value)}
+                  placeholder="Leave blank to use product description"
+                  rows={3}
+                  maxLength={160}
+                />
               </div>
             </CardContent>
           </Card>

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { cloudfrontLoader } from "@/lib/cloudfront-loader";
 import { getCategories, Category } from "@/lib/api/categories";
 
 interface ApiResponse<T> {
@@ -68,6 +69,7 @@ export function Footer() {
                   src="/logo1.png"
                   width={50}
                   height={50}
+                  loader={cloudfrontLoader}
                   alt="Korean Skincare Shop BD Logo"
                   className="w-13 h-12 object-contain"
                 />
@@ -183,7 +185,7 @@ export function Footer() {
                 categories.map((category) => (
                   <Link
                     key={category.id}
-                    href={`/products?category=${category.id}`}
+                    href={`/products?category=${category.slug || category.id}`}
                     className="block text-gray-400 hover:text-primary capitalize transition-colors">
                     {category.name}
                   </Link>

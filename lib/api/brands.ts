@@ -3,8 +3,11 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 export interface Brand {
   id: string;
   name: string;
+  slug?: string;
   logoUrl?: string;
   description?: string;
+  metaTitle?: string;
+  metaDescription?: string;
   createdAt: string;
   updatedAt: string;
   productCount?: number;
@@ -13,6 +16,9 @@ export interface Brand {
 export interface CreateBrandRequest {
   name: string;
   description?: string;
+  slug?: string;
+  metaTitle?: string;
+  metaDescription?: string;
   logo?: File;
 }
 

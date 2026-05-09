@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { cloudfrontLoader } from "@/lib/cloudfront-loader";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -250,6 +251,8 @@ export function ProductInfo({
                   src={brandLogo}
                   alt={brandName}
                   fill
+                  loader={cloudfrontLoader}
+                  sizes="32px"
                   className="object-cover"
                 />
               </div>

@@ -94,7 +94,7 @@ export function ProductDetailPageClient({ id }: { id: string }) {
           <span>/</span>
           <Link href="/products" className="hover:text-primary">Products</Link>
           <span>/</span>
-          <Link href={`/products?category=${product.category?.id}`} className="hover:text-primary">
+          <Link href={`/products?category=${product.category?.slug || product.category?.id}`} className="hover:text-primary">
             {product.category?.name
               ? product.category.name.length > 10
           ? product.category.name.slice(0, 10) + '...'

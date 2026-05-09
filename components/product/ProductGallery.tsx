@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
+import { cloudfrontLoader } from "@/lib/cloudfront-loader";
 
 interface ProductGalleryProps {
   images: string[];
@@ -28,8 +29,10 @@ export function ProductGallery({
           src={images[selectedImage]}
           alt={name}
           fill
-          className="object-contain"
+          loader={cloudfrontLoader}
+          sizes="(max-width: 1024px) 100vw, 50vw"
           priority
+          className="object-contain"
         />
         {isNew && (
           <Badge className="top-4 left-4 absolute bg-primary text-white">
@@ -56,6 +59,8 @@ export function ProductGallery({
               src={image}
               alt={`${name} ${index + 1}`}
               fill
+              loader={cloudfrontLoader}
+              sizes="80px"
               className="object-cover"
             />
           </button>

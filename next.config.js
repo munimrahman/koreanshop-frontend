@@ -9,22 +9,16 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    unoptimized: true, // Disable image optimization temporarily
-    domains: ['res.cloudinary.com', 'di52x3c4ntpb8.cloudfront.net'],
-    formats: ['image/webp', 'image/avif'],
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 2592000,
+    formats: ['image/webp'],
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    deviceSizes: [640, 828, 1080, 1920],
+    imageSizes: [128, 256, 384],
     remotePatterns: [
-      {
-        protocol: "http",
-        hostname: "**",
-      },
-      {
-        protocol: "https", 
-        hostname: "**",
-      },
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
+      { protocol: 'https', hostname: 'di52x3c4ntpb8.cloudfront.net' },
     ],
   },
   experimental: {

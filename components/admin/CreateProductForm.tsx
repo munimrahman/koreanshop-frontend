@@ -22,6 +22,16 @@ import { useAdmin } from "@/contexts/AdminContext";
 import { toast } from "sonner";
 import Image from "next/image";
 
+function toSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export function CreateProductForm() {
   const [formData, setFormData] = useState<CreateProductRequest>({
     name: "",
@@ -29,7 +39,11 @@ export function CreateProductForm() {
     stockQuantity: 0,
     description: "",
     isPublished: true,
+    slug: "",
+    metaTitle: "",
+    metaDescription: "",
   });
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [mainImage, setMainImage] = useState<File | null>(null);
@@ -106,11 +120,15 @@ export function CreateProductForm() {
     fetchInitialData();
   }, [fetchInitialData]);
 
+  useEffect(() => {
+    if (!slugManuallyEdited) {
+      setFormData((prev) => ({ ...prev, slug: toSlug(prev.name || "") }));
+    }
+  }, [formData.name, slugManuallyEdited]);
+
   const handleInputChange = (field: keyof CreateProductRequest, value: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    if (field === "slug") setSlugManuallyEdited(true);
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -563,6 +581,54 @@ export function CreateProductForm() {
                       </label>
                     )}
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+            {/* SEO Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle>SEO Settings</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="slug">URL Slug</Label>
+                  <div className="flex items-center mt-1">
+                    <span className="inline-flex items-center px-3 border border-r-0 border-input rounded-l-md bg-muted text-muted-foreground text-sm h-10">/products/</span>
+                    <Input
+                      id="slug"
+                      className="rounded-l-none"
+                      value={formData.slug || ""}
+                      onChange={(e) => handleInputChange("slug", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-"))}
+                      placeholder="product-url-slug (Leave blank to auto-generate)"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between items-center">
+                    <Label htmlFor="metaTitle">Meta Title</Label>
+                    <span className="text-muted-foreground text-xs">{(formData.metaTitle || "").length}/60</span>
+                  </div>
+                  <Input
+                    id="metaTitle"
+                    value={formData.metaTitle || ""}
+                    onChange={(e) => handleInputChange("metaTitle", e.target.value)}
+                    placeholder="Leave blank to use product name"
+                    maxLength={60}
+                  />
+                </div>
+                <div>
+                  <div className="flex justify-between items-center">
+                    <Label htmlFor="metaDescription">Meta Description</Label>
+                    <span className="text-muted-foreground text-xs">{(formData.metaDescription || "").length}/160</span>
+                  </div>
+                  <Textarea
+                    id="metaDescription"
+                    value={formData.metaDescription || ""}
+                    onChange={(e) => handleInputChange("metaDescription", e.target.value)}
+                    placeholder="Leave blank to use product description"
+                    rows={3}
+                    maxLength={160}
+                  />
                 </div>
               </CardContent>
             </Card>

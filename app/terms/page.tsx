@@ -2,6 +2,24 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, FileText, Scale, AlertTriangle, CreditCard, Truck } from 'lucide-react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Terms of Service | Korean Skincare Shop BD',
+  description: 'Review our terms of service and conditions of use for Korean Skincare Shop BD. Understand your rights and responsibilities when shopping with us.',
+  keywords: ['terms of service', 'terms and conditions', 'user agreement', 'policies'],
+  openGraph: {
+    title: 'Terms of Service',
+    description: 'Review our terms and conditions of use.',
+    url: 'https://www.koreanskincareshopbd.com/terms',
+    type: 'website',
+    images: [{ url: '/logo2.png', width: 1200, height: 630, alt: 'Terms of Service' }],
+  },
+  robots: {
+    index: false,
+    follow: true,
+  },
+};
 
 const TermsOfServicePage: React.FC = () => {
     return (
