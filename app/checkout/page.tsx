@@ -459,7 +459,6 @@ export default function CheckoutPage() {
 
       toast({
         title: "Order Placed Successfully!",
-        description: `Your order ${result.data.orderId} has been created.`,
       });
 
       // Clear cart items in state
